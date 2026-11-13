@@ -10,8 +10,10 @@ test.describe("Страница иконки", () => {
     await search.openFirstIcon();
 
     const icon = new IconPage(page);
-    await expect(icon.title).toBeVisible();
-    await expect(icon.title).not.toBeEmpty();
+    await expect(icon.previewImage).toBeVisible();
+    const name = await icon.getIconName();
+    expect(name).not.toBe("");
+    await expect(icon.titleLink(name)).toBeVisible();
     await expect(icon.downloadButton).toBeVisible();
   });
 });

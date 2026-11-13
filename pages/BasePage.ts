@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
 
 export class BasePage {
   constructor(protected readonly page: Page) {
@@ -9,11 +9,11 @@ export class BasePage {
    * Баннер cookie закрываем через addLocatorHandler: Playwright сам
    * вызывает обработчик, когда баннер появляется поверх страницы,
    * без фиксированных пауз.
-   * TODO: после первого прогона сверить текст кнопки с реальным баннером.
+   * TODO: сверить текст кнопки с реальным баннером, когда он появится.
    */
   private registerCookieBannerHandler(): void {
     const acceptButton: Locator = this.page
-      .getByRole("button", { name: /accept|agree|got it|allow all|ok/i })
+      .getByRole("button", { name: /^(accept( all)?( cookies)?|i agree|agree|got it|allow all)$/i })
       .first();
 
     this.page.addLocatorHandler(acceptButton, async (button) => {
@@ -23,5 +23,8 @@ export class BasePage {
 
   async open(path: string): Promise<void> {
     await this.page.goto(path, { waitUntil: "domcontentloaded" });
+    // Предусловие: английская версия интерфейса. Если сайт отдал другой язык,
+    // тест падает сразу с понятной причиной
+    await expect(this.page.locator("html")).toHaveAttribute("lang", /^en/);
   }
 }
