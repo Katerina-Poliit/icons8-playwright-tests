@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.DS_Store
+# скачанные в тестах файлы
+downloads/
+# playwright-report/ и test-results/ НЕ игнорируем:
+# по заданию нужен HTML-отчёт и trace последнего локального прогона
