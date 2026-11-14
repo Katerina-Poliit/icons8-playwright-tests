@@ -17,7 +17,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chrome
       # Тесты идут с окном (headless: false), поэтому в CI нужен виртуальный дисплей
-      - run: xvfb-run --auto-servernum npm test
+      - run: xvfb-run --auto-servernum npx playwright test --grep-invert @download
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -9,15 +9,33 @@ test.describe("Поиск иконок", () => {
     await search.expectResultsFor("cat");
   });
 
-  test("бессмысленный запрос: пользователь видит пустой результат", async ({ page }) => {
+  test("бессмысленный запрос: страница «ничего не найдено»", async ({ page }) => {
     const search = new SearchPage(page);
     await search.openIconsPage();
     await search.search("qzxwvjkplm");
-    // TODO: после ручной проверки зафиксировать фактический текст пустого состояния
-    await expect(search.iconLinks).toHaveCount(0);
+    await search.expectNothingFound("qzxwvjkplm");
   });
 
-  test.fixme("фильтр по стилю сужает выдачу", async () => {
-    // TODO: добавить после изучения левой панели фильтров на живом сайте
+  test("фильтр Technique → Filled сужает выдачу, повторное нажатие снимает его", async ({ page }) => {
+    const search = new SearchPage(page);
+    await search.openIconsPage();
+    await search.search("cat");
+    await search.expectResultsFor("cat");
+    const before = await search.getResultsCount();
+
+    // Включаем фильтр: адрес меняется, результатов становится меньше (но не ноль)
+    await search.applyFilledFilter();
+    await expect(page).toHaveURL(/technique-filled/);
+    await expect
+      .poll(() => search.readResultsCount(), { timeout: 20_000 })
+      .toBeLessThan(before);
+    expect(await search.readResultsCount()).toBeGreaterThan(0);
+
+    // Повторное нажатие снимает фильтр: адрес и число результатов возвращаются
+    await search.applyFilledFilter();
+    await expect(page).not.toHaveURL(/technique-filled/);
+    await expect
+      .poll(() => search.readResultsCount(), { timeout: 20_000 })
+      .toBe(before);
   });
 });
