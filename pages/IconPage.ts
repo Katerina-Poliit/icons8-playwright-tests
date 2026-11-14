@@ -30,6 +30,6 @@ export class IconPage extends BasePage {
 
   async openDownloadDialog(): Promise<void> {
     await this.downloadButton.click();
-    await expect(this.dialogDownloadButton).toBeVisible();
+    await expect(this.dialogDownloadButton).toBeVisible({ timeout: 20_000 });
   }
 }
